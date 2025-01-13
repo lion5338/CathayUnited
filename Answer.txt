@@ -1,0 +1,320 @@
+//Link To CodeSandbox:https://codesandbox.io/p/sandbox/sharp-pateu-fd3kxf
+//Q1
+//1.1
+function sortUserName(users) {
+    return users.sort((a, b) => {
+        const keyA = `${a.firstName}${a.lastName}${a.customerID}`;
+        const keyB = `${b.firstName}${b.lastName}${b.customerID}`;
+        if (keyA < keyB) return -1;
+        if (keyA > keyB) return 1;
+        return 0;
+    });
+}
+
+//1.2
+function sortByType(users) {
+    const professionPriority = {
+        systemAnalytics: 1,
+        engineer: 2,
+        productOwner: 3,
+        freelancer: 4,
+        student: 5,
+    };
+
+    return users.sort((a, b) => {
+        return professionPriority[a.profession] - professionPriority[b.profession];
+    });
+}
+
+//Q2.
+//2.1
+/* Due to specificity the color blue does not apply to the first list item. 
+The selector .container .shop-list li.item is more specific than .container .shop-list .item, 
+therefore the green color is taking precedence.
+
+Solution: 
+We can fix this by increasing the specificity of the color: blue rule or overriding it using the !important declaration.
+
+.container .shop-list li.item:first-child {
+    color: blue !important;
+}
+
+
+*/
+
+//2.2
+/* The background color of the list items is alternating between gray and white.*/
+/*
+.container .shop-list li.item:nth-child(odd) {
+    background-color: gray;
+}
+.container .shop-list li.item:nth-child(even) {
+    background-color: white;
+}
+*/
+
+//Q3
+function getUniqueNumber(items) {
+    const uniqueItems = [...new Set(items)];
+    console.log(uniqueItems);
+}
+//Q4
+/*
+A Virtual DOM is a lightweight, in-memory representation of the real DOM,
+primarily used by libraries like React and Vue to speed up webpage updates.
+It can be thought of as a lightweight copy of the browser's actual display (Real DOM).
+
+### **What Problem Does It Solve?**
+
+a. Quickly Comparing Changes:
+    The Virtual DOM calculates the differences between the "old" and the "new "
+    view and updates only the necessary parts, rather than redrawing everything when data changes.
+
+b.Reducing Real DOM Operations:
+    To improve performance, the Virtual DOM collects multiple changes and applies
+    them to the Real DOM in a single efficient operation.
+
+*/
+
+//Q5.
+/*
+"never" represents a situation where a function never returns a value.
+It is primarily used in functions that cannot complete,
+such as those that throw an error or run in an infinite loop.
+
+On the other hand, "void" represents a function that can still finish
+executing but doesn’t return a meaningful value.
+It is mainly used for functions that perform an action without needing to return anything.*/
+
+//Q6.
+/*
+Framework-based websites are built using frameworks like "React","Vue.js",or"Laravel",
+while normal websites rely solely on core web technologies like "HTML","CSS","JavaScrip",
+and raw server-side languages like "PHP" or "Python".
+
+### **Key Differences**
+
+a.Structure:
+    Frameworks provide a standardized structure, which is ideal for scalable,
+    dynamic projects and team collaboration.  
+
+    Normal websites, on the other hand, are fully customizable and defined by the developer.
+    While they can be quicker for small projects,but may become difficult to maintain 
+    as the project scales.
+
+b.Built-in Tools: 
+    Frameworks come with powerful built-in tools, such as routing, validation,
+    and protection against cross-site scripting, supported by active communities.  
+    
+    Normal websites require developers to manually implement all features,
+    which can be time-consuming for complex functionality.
+
+c.Development Speed:  
+    Framework-based websites benefit from many built-in features, significantly
+    speeding up development for complex projects.  
+
+    Normal websites might be faster for small, simple projects but tend to slow down
+    when dealing with larger or more intricate requirements.
+*/
+
+//Q7.
+/*The issue is that clicking the "Switch Person" button unmounts the TaskCounter component
+and replaces it with a new instance. This reinitializes the state (tasks) to 0 because
+useState(0) is called again for each new component.
+
+State doesn't persist because React resets the state each time the TaskCounter component
+is remounted, causing the previous state to be lost when switching between "Alice" and "Bob.
+*/
+import { useState } from 'react';
+ 
+export default function TaskManager() {
+    // Set the default person to "Alice"
+    const [isPersonAlice, setIsPersonAlice] = useState(true);
+    // Initialize the tasks state with both Alice and Bob having 0 tasks
+    const [tasks, setTasks] = useState({ Alice: 0, Bob: 0 });     
+    const currentPerson = isPersonAlice ? "Alice" : "Bob";
+
+    //  Increment the task count for the current person
+    const incrementTasks = () => {
+        setTasks((prevTasks) => ({
+            // Keep the existing task counts
+            ...prevTasks,
+            //  Increment the task count for the current person
+            [currentPerson]: prevTasks[currentPerson] + 1,
+        }));
+    };
+
+    return (
+        <div>         
+            <h1>{currentPerson}'s tasks: {tasks[currentPerson]}</h1>
+          
+            <button onClick={incrementTasks}>Complete Task</button>
+          
+            <button onClick={() => setIsPersonAlice(!isPersonAlice)}>
+                Switch Person
+            </button>
+        </div>
+    );
+}
+
+
+//Q8.
+/*
+Identified Issues:
+    1.Directly Modifying State:
+        The original code directly modifies the todos array inside the toggleTodo function.
+        In React, you should never modify state directly. 
+        Instead,create a new version of the data and update the state.Otherwise,
+        the UI might not update correctly.
+    2.Logical Errors in Data Handling:
+        In the handleStudyPointsChange function, the code incorrectly treats basePoints as
+        a function,even though it’s a piece of state data. 
+    3.Destructuring an array as though it’s a single object:
+        The destructuring of todos is incorrect because todos is an array.
+    4.Mixing UI and Logic:
+        Create separate functions for data processing (e.g., toggleTodo) and UI rendering
+        can makes the code easier to understand and maintain.
+    5.Unclear Button Functionality:
+        toggleTodo expects id, but it’s unclear how id is being passed to the handler in the button click event.
+
+
+
+*/
+
+import React, { useState } from "react";
+
+const TodoList = () => {
+    const [todos, setTodos] = useState([
+        { id: 1, text: "學習 React", completed: false, studyPoint: 3 },
+        { id: 2, text: "建立專案", completed: false, studyPoint: 1 }
+    ]);
+
+    const [basePoints, setBasePoints] = useState(3);
+    const [sumPoints, setSumPoints] = useState(0);
+
+    // If the current todo's id matches the provided id, 
+    // create a new todo object with the completed status toggled .
+    // Otherwise, return the original todo object unchanged.
+    const toggleTodo = (id) => {
+        const updatedTodos = todos.map((todo) =>
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        setTodos(updatedTodos);
+    };
+
+    const handleStudyPointsChange = (e) => {
+        const value = parseInt(e.target.value) || 0;
+        setBasePoints(value);
+        setSumPoints(value + basePoints);
+    };
+
+    return (
+        <div>
+            {todos.map((todo) => (
+                <div key={todo.id}>
+                    <p>課程名稱: {todo.text}</p>
+                    <label>學習點數: </label>
+                    <input
+                        type="number"
+                        value={todo.studyPoint}
+                        onChange={(e) => handleStudyPointsChange(e)}
+                    />
+                    <p>總累積點數: {sumPoints}</p>
+                    <button onClick={() => toggleTodo(todo.id)}>
+                        篩選課程
+                    </button>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+export default TodoList;
+
+
+//Q9.
+/*
+Identified Issues:
+    1.Repeated Rendering of the Same Data:
+       The ParentComponent renders <GrandchildComponent> directly, and it’s also rendered inside ChildComponent.
+       This duplication makes the data (name and age) display multiple times unnecessarily.
+    2.Prop Drilling:
+        Props (name and age) are passed down through multiple components manually,
+        it can get unmanageable as the component hierarchy grows deeper.
+*/
+import React, { createContext, useContext, useState } from 'react';
+
+const MyDataContext = createContext();
+
+function ParentComponent() {
+  const [name, setName] = useState("Naro");
+  const [age, setAge] = useState(12);
+  return (
+    <MyDataContext.Provider value={{ name, age }}>
+      <ChildComponent />
+    </MyDataContext.Provider>
+  );
+}
+
+function ChildComponent() {  
+  const { name, age } = useContext(MyDataContext);
+
+  return (
+    <div>
+      <p>Name: {name}</p>
+      <p>Age: {age}</p>
+      <GrandchildComponent />
+    </div>
+  );
+}
+
+function GrandchildComponent() {
+ 
+  const { name, age } = useContext(MyDataContext);
+
+  return (
+    <div>
+      <p>Name: {name}</p>
+      <p>Age: {age}</p>
+    </div>
+  );
+}
+
+
+//Q10.
+import React, { useRef } from "react";
+ 
+function SearchButton({ focusInput }) {
+    return (
+      
+        <button onClick={focusInput}>Search</button>
+    );
+}
+
+ 
+function SearchInput({ inputRef }) {
+    return ( 
+        <input ref={inputRef} />
+    );
+}
+ 
+export default function Page() {
+    // Use a ref for referencing the input element in SearchInput
+    const inputRef = useRef();
+
+     
+    const focusInput = () => {
+        // Call the .focus() method to focus the input field if the ref is attached.
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    };
+ 
+    return (
+        <nav>           
+            <SearchButton focusInput={focusInput} />  
+            <SearchInput inputRef={inputRef} />
+        </nav>
+    );
+}
+
